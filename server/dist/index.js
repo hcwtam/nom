@@ -13,9 +13,10 @@ const post_1 = require("./resolvers/post");
 const Post_1 = require("./entities/Post");
 const User_1 = require("./entities/User");
 const user_1 = require("./resolvers/user");
-const redis_1 = __importDefault(require("redis"));
+const ioredis_1 = __importDefault(require("ioredis"));
 const express_session_1 = __importDefault(require("express-session"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
+const cors_1 = __importDefault(require("cors"));
 const main = async () => {
     await typeorm_1.createConnection({
         type: 'postgres',
@@ -28,10 +29,14 @@ const main = async () => {
     });
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
-    const redisClient = redis_1.default.createClient();
+    const redis = new ioredis_1.default();
+    app.use(cors_1.default({
+        origin: 'http://localhost:3000',
+        credentials: true
+    }));
     app.use(express_session_1.default({
-        store: new RedisStore({ client: redisClient, disableTouch: true }),
-        name: 'qid',
+        store: new RedisStore({ client: redis, disableTouch: true }),
+        name: constants_1.COOKIE_NAME,
         secret: 'ujyiuyyfbtyjhghgffghjj',
         resave: false,
         saveUninitialized: false,
@@ -47,9 +52,12 @@ const main = async () => {
             resolvers: [post_1.PostResolver, user_1.UserResolver],
             validate: false
         }),
-        context: ({ req, res }) => ({ req, res })
+        context: ({ req, res }) => ({ req, res, redis })
     });
-    apolloServer.applyMiddleware({ app });
+    apolloServer.applyMiddleware({
+        app,
+        cors: false
+    });
     app.listen(4000, () => {
         console.log('server up and running');
     });
