@@ -4,13 +4,16 @@ import {
   Ctx,
   Field,
   InputType,
+  Int,
   Mutation,
+  ObjectType,
   Query,
   Resolver,
   UseMiddleware
 } from 'type-graphql';
 import { MyContext } from '../types';
 import { isAuth } from '../middleware/isAuth';
+import { getConnection } from 'typeorm';
 
 @InputType()
 class PostInput {
@@ -21,11 +24,40 @@ class PostInput {
   text: string;
 }
 
+@ObjectType()
+class pagninatedPosts {
+  @Field(() => [Post])
+  posts: Post[];
+
+  @Field()
+  hasMore: boolean;
+}
+
 @Resolver()
 export class PostResolver {
-  @Query(() => [Post])
-  async posts(): Promise<Post[]> {
-    return Post.find();
+  @Query(() => pagninatedPosts)
+  async posts(
+    @Arg('limit', () => Int) limit: number,
+    @Arg('cursor', () => String, { nullable: true }) cursor: string | null
+  ): Promise<pagninatedPosts> {
+    const trueLimit = Math.min(50, limit);
+    const trueLimitPlusOne = trueLimit + 1;
+
+    let qb = getConnection()
+      .getRepository(Post)
+      .createQueryBuilder('p')
+      .orderBy('"createdAt"', 'DESC')
+      .take(trueLimitPlusOne);
+
+    if (cursor)
+      qb = qb.where('"createdAt" < :cursor', { cursor: new Date(+cursor) });
+
+    const posts = await qb.getMany();
+
+    return {
+      posts: posts.slice(0, trueLimit),
+      hasMore: posts.length === trueLimitPlusOne
+    };
   }
 
   @Query(() => Post)
@@ -61,4 +93,14 @@ export class PostResolver {
     await Post.delete(id);
     return true;
   }
+
+  // @Mutation(()=>Boolean)
+  // @UseMiddleware(isAuth)
+  // async vote(
+  //   @Arg('postId',()=>Int)postId: number,
+  //   @Ctx() {req}:MyContext
+  // ) {
+  //   const userId = req.session.userId;
+  //   return true
+  // }
 }
