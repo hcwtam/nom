@@ -17,6 +17,8 @@ const ioredis_1 = __importDefault(require("ioredis"));
 const express_session_1 = __importDefault(require("express-session"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const cors_1 = __importDefault(require("cors"));
+const Upvote_1 = require("./entities/Upvote");
+const createUserLoader_1 = require("./utils/createUserLoader");
 const main = async () => {
     await typeorm_1.createConnection({
         type: 'postgres',
@@ -25,7 +27,7 @@ const main = async () => {
         database: 'nom',
         logging: !constants_1.__prod__,
         synchronize: true,
-        entities: [Post_1.Post, User_1.User]
+        entities: [Post_1.Post, User_1.User, Upvote_1.Upvote]
     });
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
@@ -52,7 +54,12 @@ const main = async () => {
             resolvers: [post_1.PostResolver, user_1.UserResolver],
             validate: false
         }),
-        context: ({ req, res }) => ({ req, res, redis })
+        context: ({ req, res }) => ({
+            req,
+            res,
+            redis,
+            userLoader: createUserLoader_1.createUserLoader()
+        })
     });
     apolloServer.applyMiddleware({
         app,

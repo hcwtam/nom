@@ -17,6 +17,8 @@ const Post_1 = require("../entities/Post");
 const type_graphql_1 = require("type-graphql");
 const isAuth_1 = require("../middleware/isAuth");
 const typeorm_1 = require("typeorm");
+const Upvote_1 = require("../entities/Upvote");
+const User_1 = require("../entities/User");
 let PostInput = class PostInput {
 };
 __decorate([
@@ -44,6 +46,9 @@ pagninatedPosts = __decorate([
     type_graphql_1.ObjectType()
 ], pagninatedPosts);
 let PostResolver = class PostResolver {
+    async creator(post, { userLoader }) {
+        return userLoader.load(post.creatorId);
+    }
     async posts(limit, cursor) {
         const trueLimit = Math.min(50, limit);
         const trueLimitPlusOne = trueLimit + 1;
@@ -80,7 +85,48 @@ let PostResolver = class PostResolver {
         await Post_1.Post.delete(id);
         return true;
     }
+    async vote(postId, value, { req }) {
+        const isUpvote = value !== -1;
+        const updatedValue = isUpvote ? 1 : -1;
+        const userId = req.session.userId;
+        const upvote = await Upvote_1.Upvote.findOne({ where: { postId, userId } });
+        if (upvote && upvote.value !== updatedValue) {
+            typeorm_1.getConnection().transaction(async (tm) => {
+                await tm.query(`
+          update upvote
+          set value = $1
+          where "postId" = $2 and "userId" = $3
+`, [updatedValue, postId, userId]);
+                await tm.query(`
+          update post
+          set points = points + $1
+          where id = $2
+`, [2 * updatedValue, postId]);
+            });
+        }
+        else if (!upvote) {
+            typeorm_1.getConnection().transaction(async (tm) => {
+                await tm.query(`
+          insert into upvote ("userId", "postId", value)
+          values (${userId},${postId},${updatedValue})
+`);
+                await tm.query(`
+          update post
+          set points = points + ${updatedValue}
+          where id = ${postId};
+`);
+            });
+        }
+        return true;
+    }
 };
+__decorate([
+    type_graphql_1.FieldResolver(() => User_1.User),
+    __param(0, type_graphql_1.Root()), __param(1, type_graphql_1.Ctx()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Post_1.Post, Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "creator", null);
 __decorate([
     type_graphql_1.Query(() => pagninatedPosts),
     __param(0, type_graphql_1.Arg('limit', () => type_graphql_1.Int)),
@@ -120,8 +166,18 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "deletePost", null);
+__decorate([
+    type_graphql_1.Mutation(() => Boolean),
+    type_graphql_1.UseMiddleware(isAuth_1.isAuth),
+    __param(0, type_graphql_1.Arg('postId', () => type_graphql_1.Int)),
+    __param(1, type_graphql_1.Arg('value', () => type_graphql_1.Int)),
+    __param(2, type_graphql_1.Ctx()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number, Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "vote", null);
 PostResolver = __decorate([
-    type_graphql_1.Resolver()
+    type_graphql_1.Resolver(Post_1.Post)
 ], PostResolver);
 exports.PostResolver = PostResolver;
 //# sourceMappingURL=post.js.map

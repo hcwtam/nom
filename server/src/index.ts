@@ -13,6 +13,8 @@ import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { MyContext } from './types';
 import cors from 'cors';
+import { Upvote } from './entities/Upvote';
+import { createUserLoader } from './utils/createUserLoader';
 
 const main = async () => {
   await createConnection({
@@ -22,7 +24,8 @@ const main = async () => {
     database: 'nom',
     logging: !__prod__,
     synchronize: true,
-    entities: [Post, User]
+    entities: [Post, User, Upvote]
+    // dropSchema: true
   });
 
   // await User.delete({});
@@ -61,7 +64,12 @@ const main = async () => {
       resolvers: [PostResolver, UserResolver],
       validate: false
     }),
-    context: ({ req, res }): MyContext => ({ req, res, redis })
+    context: ({ req, res }): MyContext => ({
+      req,
+      res,
+      redis,
+      userLoader: createUserLoader()
+    })
   });
 
   apolloServer.applyMiddleware({
