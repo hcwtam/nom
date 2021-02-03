@@ -43,6 +43,10 @@ export class Recipe extends BaseEntity {
 
   @Field()
   @Column()
+  time: number;
+
+  @Field()
+  @Column()
   creatorId: number;
 
   @ManyToOne(() => User, (user) => user.recipes)

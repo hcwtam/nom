@@ -8,6 +8,9 @@ export class RecipeInput {
   @Field({ nullable: true })
   description?: string;
 
+  @Field()
+  time: number;
+
   @Field(() => [StepInput])
   steps: StepInput[];
 

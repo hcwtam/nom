@@ -97,6 +97,7 @@ export class RecipeResolver {
     const recipe = await Recipe.create({
       title: input.title,
       description: input.description,
+      time: input.time,
       ingredients,
       steps,
       creatorId: req.session.userId
