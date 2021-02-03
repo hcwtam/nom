@@ -11,7 +11,7 @@ import { User } from '../entities/User';
 import argon2 from 'argon2';
 import { MyContext } from '../types';
 import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from '../constants';
-import { UsernamePasswordInput } from './UsernamePasswordInput';
+import { UsernamePasswordInput } from './types';
 import { validateRegister } from '../utils/validateRegister';
 import { v4 } from 'uuid';
 import { sendEmail } from '../utils/sendEmail';

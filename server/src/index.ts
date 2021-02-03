@@ -4,8 +4,8 @@ import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { COOKIE_NAME, __prod__ } from './constants';
-import { PostResolver } from './resolvers/post';
-import { Post } from './entities/Post';
+import { RecipeResolver } from './resolvers/recipe';
+import { Recipe } from './entities/Recipe';
 import { User } from './entities/User';
 import { UserResolver } from './resolvers/user';
 import Redis from 'ioredis';
@@ -15,6 +15,8 @@ import { MyContext } from './types';
 import cors from 'cors';
 import { Upvote } from './entities/Upvote';
 import { createUserLoader } from './utils/createUserLoader';
+import { Ingredient } from './entities/Ingredient';
+import { Step } from './entities/Step';
 
 const main = async () => {
   await createConnection({
@@ -24,12 +26,15 @@ const main = async () => {
     database: 'nom',
     logging: !__prod__,
     synchronize: true,
-    entities: [Post, User, Upvote]
+    entities: [User, Upvote, Recipe, Ingredient, Step]
     // dropSchema: true
   });
 
+  // await Upvote.delete({});
   // await User.delete({});
-  // await Post.delete({});
+  // await Recipe.delete({});
+  // await Step.delete({});
+  // await Ingredient.delete({});
 
   const app = express();
 
@@ -61,7 +66,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [PostResolver, UserResolver],
+      resolvers: [RecipeResolver, UserResolver],
       validate: false
     }),
     context: ({ req, res }): MyContext => ({

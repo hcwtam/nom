@@ -9,8 +9,8 @@ const express_1 = __importDefault(require("express"));
 const apollo_server_express_1 = require("apollo-server-express");
 const type_graphql_1 = require("type-graphql");
 const constants_1 = require("./constants");
-const post_1 = require("./resolvers/post");
-const Post_1 = require("./entities/Post");
+const recipe_1 = require("./resolvers/recipe");
+const Recipe_1 = require("./entities/Recipe");
 const User_1 = require("./entities/User");
 const user_1 = require("./resolvers/user");
 const ioredis_1 = __importDefault(require("ioredis"));
@@ -19,6 +19,8 @@ const connect_redis_1 = __importDefault(require("connect-redis"));
 const cors_1 = __importDefault(require("cors"));
 const Upvote_1 = require("./entities/Upvote");
 const createUserLoader_1 = require("./utils/createUserLoader");
+const Ingredient_1 = require("./entities/Ingredient");
+const Step_1 = require("./entities/Step");
 const main = async () => {
     await typeorm_1.createConnection({
         type: 'postgres',
@@ -27,7 +29,7 @@ const main = async () => {
         database: 'nom',
         logging: !constants_1.__prod__,
         synchronize: true,
-        entities: [Post_1.Post, User_1.User, Upvote_1.Upvote]
+        entities: [User_1.User, Upvote_1.Upvote, Recipe_1.Recipe, Ingredient_1.Ingredient, Step_1.Step]
     });
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
@@ -51,7 +53,7 @@ const main = async () => {
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: await type_graphql_1.buildSchema({
-            resolvers: [post_1.PostResolver, user_1.UserResolver],
+            resolvers: [recipe_1.RecipeResolver, user_1.UserResolver],
             validate: false
         }),
         context: ({ req, res }) => ({

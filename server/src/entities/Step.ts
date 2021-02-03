@@ -5,19 +5,17 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
-import { Upvote } from './Upvote';
-import { User } from './User';
+import { Recipe } from './Recipe';
 
 @ObjectType()
 @Entity()
-export class Post extends BaseEntity {
+export class Step extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Field(() => String)
   @CreateDateColumn()
@@ -29,24 +27,16 @@ export class Post extends BaseEntity {
 
   @Field()
   @Column()
-  title!: string;
+  step: number;
 
   @Field()
   @Column()
-  text!: string;
+  description: string;
 
-  @Field()
-  @Column({ type: 'int', default: 0 })
-  points!: number;
+  @Field({ nullable: true })
+  @Column({ type: 'int', nullable: true })
+  recipeId: number;
 
-  @Field()
-  @Column()
-  creatorId: number;
-
-  @Field()
-  @ManyToOne(() => User, (user) => user.posts)
-  creator: User;
-
-  @OneToMany(() => Upvote, (upvote) => upvote.post)
-  upvotes: Upvote[];
+  @ManyToOne(() => Recipe, (recipe) => recipe.steps)
+  recipe: Recipe;
 }

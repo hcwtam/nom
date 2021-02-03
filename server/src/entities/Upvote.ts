@@ -1,6 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Post } from './Post';
+import { Recipe } from './Recipe';
 import { User } from './User';
 
 @ObjectType()
@@ -20,9 +20,9 @@ export class Upvote extends BaseEntity {
 
   @Field()
   @PrimaryColumn()
-  postId!: number;
+  recipeId!: number;
 
-  @Field(() => Post)
-  @ManyToOne(() => Post, (post) => post.upvotes)
-  post: Post;
+  @Field(() => Recipe)
+  @ManyToOne(() => Recipe, (recipe) => recipe.upvotes)
+  recipe: Recipe;
 }
