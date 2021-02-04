@@ -6,7 +6,7 @@ export const Container = (props: FlexProps) => {
       direction="column"
       alignItems="center"
       justifyContent="flex-start"
-      bg="gray.900"
+      bg="customBlack"
       color="white"
       {...props}
     />

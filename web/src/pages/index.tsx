@@ -6,7 +6,7 @@ import { Main } from '../components/Main';
 const Index = () => (
   <Container height="100vh">
     <Main>
-      <Flex align="center" justify="space-between" w="100%">
+      <Flex align="center" justify="space-between" w="100%" flexWrap="wrap">
         <Card />
         <Card />
         <Card />
