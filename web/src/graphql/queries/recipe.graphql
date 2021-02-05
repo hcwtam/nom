@@ -1,0 +1,20 @@
+query Recipe($id: Float!) {
+  recipe(id: $id) {
+    id
+    title
+    description
+    prepTime
+    activeTime
+    imageUrl
+    steps {
+      step
+      description
+    }
+    ingredients {
+      name
+      quantity
+      unit
+    }
+    createdAt
+  }
+}

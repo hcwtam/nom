@@ -1,0 +1,13 @@
+query Recipes {
+  recipes(limit: 10) {
+    recipes {
+      id
+      title
+      description
+      prepTime
+      activeTime
+      imageUrl
+    }
+    hasMore
+  }
+}

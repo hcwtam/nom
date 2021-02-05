@@ -1,12 +1,21 @@
-import { Box, Text, Badge } from '@chakra-ui/react';
+import { Box, Text, Badge, Image, Spinner } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 
-export const Card = () => {
+interface CardProps {
+  id: number;
+  title: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  prepTime: number;
+  activeTime: number;
+}
+
+export const Card = ({ title, prepTime, activeTime, imageUrl }: CardProps) => {
   const router = useRouter();
   return (
     <Box
       spacing="1.5rem"
-      maxWidth="12rem"
+      maxWidth="300px"
       p="2rem"
       m="1rem"
       borderRadius="2xl"
@@ -17,11 +26,30 @@ export const Card = () => {
       _hover={{ boxShadow: '0 0 10px #fff9ee' }}
       onClick={() => router.push('/recipes/1')}
     >
-      <Text as="h3" fontSize="2xl" fontWeight="semibold" mb={2}>
-        Boiled egg
+      <Image
+        w="200px"
+        h="150px"
+        objectFit="cover"
+        src={imageUrl || ''}
+        alt={title}
+        mb={5}
+        borderRadius={2}
+        fallback={<Spinner />}
+      />
+      <Text as="h3" fontSize="2xl" fontWeight="semibold" mb={5}>
+        {title}
       </Text>
-      <Badge bg="orange.200" color="gray.900" p={2} borderRadius="md">
-        10 mins
+      <Badge bg="orange.100" color="gray.900" p={2} borderRadius="md" mr={2}>
+        <Text borderBottom="1px solid #dadada" fontWeight="normal">
+          Total time
+        </Text>
+        <Text>{prepTime} min</Text>
+      </Badge>
+      <Badge bg="orange.300" color="gray.900" p={2} borderRadius="md">
+        <Text borderBottom="1px solid #dadada" fontWeight="normal">
+          Cook time
+        </Text>
+        <Text>{activeTime} min</Text>
       </Badge>
     </Box>
   );

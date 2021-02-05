@@ -8,6 +8,7 @@ export const Container = (props: FlexProps) => {
       justifyContent="flex-start"
       bg="customBlack"
       color="white"
+      minH="100vh"
       {...props}
     />
   );
