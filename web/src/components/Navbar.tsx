@@ -1,9 +1,13 @@
 import { Flex, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import React, { ReactElement } from 'react';
+import { useMeQuery } from '../generated/graphql';
 import Login from './Login';
+import Logout from './Logout';
 
 export default function Navbar(): ReactElement {
+  const { data } = useMeQuery();
+
   return (
     <Flex
       as="nav"
@@ -13,12 +17,23 @@ export default function Navbar(): ReactElement {
       justifyContent="space-between"
       alignItems="center"
     >
-      <Link href="/">
-        <a>Home</a>
-      </Link>
-      <Flex w={120} justifyContent="space-between">
-        <Text>Register</Text>
-        <Login />
+      <Flex justifyContent="space-between">
+        <Link href="/">
+          <a>Home</a>
+        </Link>
+        {data?.me ? (
+          <Text ml={10}>{`Welcome, ${data.me.username}`}</Text>
+        ) : null}
+      </Flex>
+      <Flex justifyContent="space-between">
+        {!data?.me ? (
+          <>
+            <Text>Register</Text>
+            <Login />
+          </>
+        ) : (
+          <Logout />
+        )}
       </Flex>
     </Flex>
   );

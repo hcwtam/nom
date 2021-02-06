@@ -1,8 +1,5 @@
 import {
   Button,
-  FormControl,
-  FormLabel,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -12,15 +9,47 @@ import {
   ModalOverlay,
   useDisclosure
 } from '@chakra-ui/react';
-import React, { ReactElement } from 'react';
+import { Form, Formik } from 'formik';
+import { MeDocument, MeQuery, useLoginMutation } from '../generated/graphql';
+import { MyField } from './form/MyField';
 
-interface Props {}
+type inputValues = {
+  usernameOrEmail: string;
+  password: string;
+};
 
-export default function Login({}: Props): ReactElement {
+export default function Login() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [login] = useLoginMutation();
+
+  const initialValues = {
+    usernameOrEmail: '',
+    password: ''
+  };
+
+  const onSubmit = async (values: inputValues) => {
+    console.log(values);
+
+    const res = await login({
+      variables: values,
+      update: (cache, { data }) => {
+        cache.writeQuery<MeQuery>({
+          query: MeDocument,
+          data: {
+            __typename: 'Query',
+            me: data?.login.user
+          }
+        });
+      }
+    });
+    if (!res.errors) onClose();
+  };
+
   return (
     <>
-      <Button onClick={onOpen}>Login</Button>
+      <Button ml={4} onClick={onOpen}>
+        Login
+      </Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay bg="rgba(255, 255, 255, 0.2);" />
@@ -30,22 +59,43 @@ export default function Login({}: Props): ReactElement {
             _hover={{ boxShadow: '0 0 5px #fff9ee' }}
             _focus={{ boxShadow: 'none' }}
           />
-          <ModalBody>
-            <FormControl id="username" isRequired mb={4}>
-              <FormLabel>Username</FormLabel>
-              <Input placeholder="Username" />
-            </FormControl>
-            <FormControl id="password" isRequired>
-              <FormLabel>Password</FormLabel>
-              <Input placeholder="Password" />
-            </FormControl>
-          </ModalBody>
+          <Formik
+            initialValues={initialValues}
+            onSubmit={(values) => onSubmit(values)}
+          >
+            {({ isSubmitting }) => (
+              <>
+                <Form>
+                  <ModalBody>
+                    <MyField
+                      label="Username"
+                      name="usernameOrEmail"
+                      placeholder="Username"
+                      isRequired
+                    />
+                    <MyField
+                      label="Password"
+                      name="password"
+                      placeholder="Password"
+                      isRequired
+                    />
+                  </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="orange" w="100%" my={4}>
-              Submit
-            </Button>
-          </ModalFooter>
+                  <ModalFooter>
+                    <Button
+                      colorScheme="orange"
+                      w="100%"
+                      my={4}
+                      isLoading={isSubmitting}
+                      type="submit"
+                    >
+                      Submit
+                    </Button>
+                  </ModalFooter>
+                </Form>
+              </>
+            )}
+          </Formik>
         </ModalContent>
       </Modal>
     </>
