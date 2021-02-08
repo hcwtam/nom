@@ -8,8 +8,14 @@ export class RecipeInput {
   @Field({ nullable: true })
   description?: string;
 
+  @Field({ nullable: true })
+  imageUrl?: string;
+
   @Field()
-  time: number;
+  prepTime: number;
+
+  @Field()
+  activeTime: number;
 
   @Field(() => [StepInput])
   steps: StepInput[];

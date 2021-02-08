@@ -37,13 +37,21 @@ export class Recipe extends BaseEntity {
   @Column({ nullable: true })
   description?: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  imageUrl?: string;
+
   @Field()
   @Column({ type: 'int', default: 0 })
   points: number;
 
   @Field()
   @Column()
-  time: number;
+  prepTime: number;
+
+  @Field()
+  @Column()
+  activeTime: number;
 
   @Field()
   @Column()

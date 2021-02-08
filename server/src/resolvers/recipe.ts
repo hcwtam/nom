@@ -97,7 +97,9 @@ export class RecipeResolver {
     const recipe = await Recipe.create({
       title: input.title,
       description: input.description,
-      time: input.time,
+      prepTime: input.prepTime,
+      activeTime: input.activeTime,
+      imageUrl: input.imageUrl,
       ingredients,
       steps,
       creatorId: req.session.userId
@@ -176,5 +178,10 @@ export class RecipeResolver {
     }
 
     return true;
+  }
+
+  @Query(() => [Recipe])
+  async paths(): Promise<Recipe[]> {
+    return Recipe.find();
   }
 }
