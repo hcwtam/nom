@@ -30,7 +30,7 @@ const Index = () => {
     );
 
   return (
-    <Container height="100vh">
+    <Container minH="100vh">
       <Navbar />
       <Main>
         <Flex align="center" justify="space-between" w="100%" flexWrap="wrap">

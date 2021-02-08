@@ -10,21 +10,23 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 import { Form, Formik, FormikHelpers } from 'formik';
-import { MeDocument, MeQuery, useLoginMutation } from '../generated/graphql';
+import { MeDocument, MeQuery, useRegisterMutation } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { MyField } from './form/MyField';
 
 type inputValues = {
-  usernameOrEmail: string;
+  username: string;
+  email: string;
   password: string;
 };
 
-export default function Login() {
+export default function Register() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [login] = useLoginMutation();
+  const [register] = useRegisterMutation();
 
   const initialValues = {
-    usernameOrEmail: '',
+    username: '',
+    email: '',
     password: ''
   };
 
@@ -32,34 +34,34 @@ export default function Login() {
     values: inputValues,
     { setErrors }: FormikHelpers<inputValues>
   ) => {
-    console.log(values);
-
-    const res = await login({
+    const res = await register({
       variables: values,
       update: (cache, { data }) => {
         cache.writeQuery<MeQuery>({
           query: MeDocument,
           data: {
             __typename: 'Query',
-            me: data?.login.user
+            me: data?.register.user
           }
         });
       }
     });
-    if (!res.errors && !res.data?.login.errors) onClose();
-    if (res.data?.login.errors) setErrors(toErrorMap(res.data.login.errors));
+    if (res.errors) console.log(res.errors);
+    if (!res.errors && !res.data?.register.errors) onClose();
+    if (res.data?.register.errors)
+      setErrors(toErrorMap(res.data.register.errors));
   };
 
   return (
     <>
       <Button ml={4} onClick={onOpen}>
-        Login
+        Register
       </Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay bg="rgba(255, 255, 255, 0.2);" />
         <ModalContent bg="#222">
-          <ModalHeader textAlign="center">Login</ModalHeader>
+          <ModalHeader textAlign="center">Register</ModalHeader>
           <ModalCloseButton
             _hover={{ boxShadow: '0 0 5px #fff9ee' }}
             _focus={{ boxShadow: 'none' }}
@@ -74,8 +76,15 @@ export default function Login() {
                   <ModalBody>
                     <MyField
                       label="Username"
-                      name="usernameOrEmail"
+                      name="username"
                       placeholder="Username"
+                      isRequired
+                    />
+                    <MyField
+                      label="Email"
+                      name="email"
+                      placeholder="Email"
+                      type="email"
                       isRequired
                     />
                     <MyField

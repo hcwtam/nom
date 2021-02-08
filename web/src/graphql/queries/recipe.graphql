@@ -5,6 +5,9 @@ query Recipe($id: Float!) {
     description
     prepTime
     activeTime
+    creator {
+      username
+    }
     imageUrl
     steps {
       step

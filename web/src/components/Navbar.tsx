@@ -1,17 +1,20 @@
-import { Flex, Text } from '@chakra-ui/react';
+import { Button, Flex, Text } from '@chakra-ui/react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { ReactElement } from 'react';
 import { useMeQuery } from '../generated/graphql';
 import Login from './Login';
 import Logout from './Logout';
+import Register from './Register';
 
 export default function Navbar(): ReactElement {
+  const router = useRouter();
   const { data } = useMeQuery();
 
   return (
     <Flex
       as="nav"
-      w="100vw"
+      w="100%"
       h={75}
       px={10}
       justifyContent="space-between"
@@ -28,11 +31,16 @@ export default function Navbar(): ReactElement {
       <Flex justifyContent="space-between">
         {!data?.me ? (
           <>
-            <Text>Register</Text>
+            <Register />
             <Login />
           </>
         ) : (
-          <Logout />
+          <>
+            <Button mr={4} onClick={() => router.push('/recipes/create')}>
+              Create
+            </Button>
+            <Logout />
+          </>
         )}
       </Flex>
     </Flex>

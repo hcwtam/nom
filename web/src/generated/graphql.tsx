@@ -17,6 +17,7 @@ export type Query = {
   __typename?: 'Query';
   recipes: PagninatedRecipes;
   recipe: Recipe;
+  paths: Array<Recipe>;
   me?: Maybe<User>;
 };
 
@@ -185,6 +186,19 @@ export type RegularUserFragment = (
   & Pick<User, 'id' | 'username'>
 );
 
+export type CreateRecipeMutationVariables = Exact<{
+  input: RecipeInput;
+}>;
+
+
+export type CreateRecipeMutation = (
+  { __typename?: 'Mutation' }
+  & { createRecipe: (
+    { __typename?: 'Recipe' }
+    & Pick<Recipe, 'id' | 'title' | 'creatorId'>
+  ) }
+);
+
 export type LoginMutationVariables = Exact<{
   usernameOrEmail: Scalars['String'];
   password: Scalars['String'];
@@ -245,6 +259,17 @@ export type MeQuery = (
   )> }
 );
 
+export type PathsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PathsQuery = (
+  { __typename?: 'Query' }
+  & { paths: Array<(
+    { __typename?: 'Recipe' }
+    & Pick<Recipe, 'id'>
+  )> }
+);
+
 export type RecipeQueryVariables = Exact<{
   id: Scalars['Float'];
 }>;
@@ -255,7 +280,10 @@ export type RecipeQuery = (
   & { recipe: (
     { __typename?: 'Recipe' }
     & Pick<Recipe, 'id' | 'title' | 'description' | 'prepTime' | 'activeTime' | 'imageUrl' | 'createdAt'>
-    & { steps: Array<(
+    & { creator: (
+      { __typename?: 'User' }
+      & Pick<User, 'username'>
+    ), steps: Array<(
       { __typename?: 'Step' }
       & Pick<Step, 'step' | 'description'>
     )>, ingredients: Array<(
@@ -286,6 +314,40 @@ export const RegularUserFragmentDoc = gql`
   username
 }
     `;
+export const CreateRecipeDocument = gql`
+    mutation CreateRecipe($input: RecipeInput!) {
+  createRecipe(input: $input) {
+    id
+    title
+    creatorId
+  }
+}
+    `;
+export type CreateRecipeMutationFn = Apollo.MutationFunction<CreateRecipeMutation, CreateRecipeMutationVariables>;
+
+/**
+ * __useCreateRecipeMutation__
+ *
+ * To run a mutation, you first call `useCreateRecipeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateRecipeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createRecipeMutation, { data, loading, error }] = useCreateRecipeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateRecipeMutation(baseOptions?: Apollo.MutationHookOptions<CreateRecipeMutation, CreateRecipeMutationVariables>) {
+        return Apollo.useMutation<CreateRecipeMutation, CreateRecipeMutationVariables>(CreateRecipeDocument, baseOptions);
+      }
+export type CreateRecipeMutationHookResult = ReturnType<typeof useCreateRecipeMutation>;
+export type CreateRecipeMutationResult = Apollo.MutationResult<CreateRecipeMutation>;
+export type CreateRecipeMutationOptions = Apollo.BaseMutationOptions<CreateRecipeMutation, CreateRecipeMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($usernameOrEmail: String!, $password: String!) {
   login(usernameOrEmail: $usernameOrEmail, password: $password) {
@@ -429,6 +491,38 @@ export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const PathsDocument = gql`
+    query Paths {
+  paths {
+    id
+  }
+}
+    `;
+
+/**
+ * __usePathsQuery__
+ *
+ * To run a query within a React component, call `usePathsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePathsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePathsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePathsQuery(baseOptions?: Apollo.QueryHookOptions<PathsQuery, PathsQueryVariables>) {
+        return Apollo.useQuery<PathsQuery, PathsQueryVariables>(PathsDocument, baseOptions);
+      }
+export function usePathsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PathsQuery, PathsQueryVariables>) {
+          return Apollo.useLazyQuery<PathsQuery, PathsQueryVariables>(PathsDocument, baseOptions);
+        }
+export type PathsQueryHookResult = ReturnType<typeof usePathsQuery>;
+export type PathsLazyQueryHookResult = ReturnType<typeof usePathsLazyQuery>;
+export type PathsQueryResult = Apollo.QueryResult<PathsQuery, PathsQueryVariables>;
 export const RecipeDocument = gql`
     query Recipe($id: Float!) {
   recipe(id: $id) {
@@ -437,6 +531,9 @@ export const RecipeDocument = gql`
     description
     prepTime
     activeTime
+    creator {
+      username
+    }
     imageUrl
     steps {
       step

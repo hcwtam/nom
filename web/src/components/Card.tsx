@@ -10,7 +10,13 @@ interface CardProps {
   activeTime: number;
 }
 
-export const Card = ({ title, prepTime, activeTime, imageUrl }: CardProps) => {
+export const Card = ({
+  title,
+  prepTime,
+  activeTime,
+  imageUrl,
+  id
+}: CardProps) => {
   const router = useRouter();
   return (
     <Box
@@ -24,18 +30,20 @@ export const Card = ({ title, prepTime, activeTime, imageUrl }: CardProps) => {
       cursor="pointer"
       transition="0.2s ease-in-out"
       _hover={{ boxShadow: '0 0 10px #fff9ee' }}
-      onClick={() => router.push('/recipes/1')}
+      onClick={() => router.push(`/recipes/${id}`)}
     >
-      <Image
-        w="200px"
-        h="150px"
-        objectFit="cover"
-        src={imageUrl || ''}
-        alt={title}
-        mb={5}
-        borderRadius={2}
-        fallback={<Spinner />}
-      />
+      {imageUrl ? (
+        <Image
+          w="200px"
+          h="150px"
+          objectFit="cover"
+          src={imageUrl}
+          alt={title}
+          mb={5}
+          borderRadius={2}
+          fallback={<Spinner />}
+        />
+      ) : null}
       <Text as="h3" fontSize="2xl" fontWeight="semibold" mb={5}>
         {title}
       </Text>

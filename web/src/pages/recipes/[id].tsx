@@ -11,7 +11,16 @@ import {
   Box
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import { useRecipeQuery } from '../../generated/graphql';
+import {
+  PathsDocument,
+  PathsQuery,
+  RecipeDocument,
+  RecipeQuery,
+  useRecipeQuery
+} from '../../generated/graphql';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { initializeApollo } from '../../lib/apollo';
+import Navbar from '../../components/Navbar';
 
 const Recipe = () => {
   const router = useRouter();
@@ -36,31 +45,46 @@ const Recipe = () => {
   let steps, ingredients;
   if (data) {
     steps = data.recipe.steps.map((step) => (
-      <ListItem>{step.description}</ListItem>
+      <ListItem key={step.step}>{step.description}</ListItem>
     ));
 
     ingredients = data.recipe.ingredients.map((ingredient) => (
-      <ListItem>
+      <ListItem key={ingredient.name}>
         {ingredient.quantity} {ingredient.unit} {ingredient.name}
       </ListItem>
     ));
   }
   return (
     <Container pb={50}>
+      <Navbar />
       <Main>
-        <Image
-          objectFit="cover"
-          src={data?.recipe.imageUrl || ''}
-          alt={data?.recipe.title}
-          mb={5}
-          borderRadius={2}
-          fallback={<Spinner />}
-        />
+        {data?.recipe.imageUrl ? (
+          <Image
+            objectFit="cover"
+            src={data?.recipe.imageUrl}
+            alt={data?.recipe.title}
+            mb={5}
+            borderRadius={2}
+            fallback={<Spinner />}
+          />
+        ) : null}
         <Text as="h1" fontSize="3rem" fontWeight="600">
           {data?.recipe.title}
         </Text>
+        <Text>
+          Author:
+          <Text fontWeight="600" display="inline-block" ml={2}>
+            {' '}
+            {data?.recipe.creator.username}
+          </Text>
+        </Text>
         <Text>{data?.recipe.description}</Text>
-        <UnorderedList>{ingredients}</UnorderedList>
+        <Box>
+          <Text as="h3" mb={2} fontWeight="600" fontSize="1.5rem">
+            Ingredients
+          </Text>
+          <UnorderedList>{ingredients}</UnorderedList>
+        </Box>
         <Flex w="100%">
           <Box>
             <Text as="h3" mb={2} fontWeight="600" fontSize="1.5rem">
@@ -72,6 +96,37 @@ const Recipe = () => {
       </Main>
     </Container>
   );
+};
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const apolloClient = initializeApollo();
+
+  const res = await apolloClient.query<PathsQuery>({
+    query: PathsDocument
+  });
+  return {
+    paths: res.data.paths.map(({ id }) => ({
+      params: { id: id.toString() }
+    })),
+    fallback: false
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const id = typeof params?.id === 'string' ? parseInt(params.id) : -1;
+  const apolloClient = initializeApollo();
+
+  await apolloClient.query<RecipeQuery>({
+    query: RecipeDocument,
+    variables: { id }
+  });
+
+  return {
+    props: {
+      initialApolloState: apolloClient.cache.extract()
+    },
+    revalidate: 15
+  };
 };
 
 export default Recipe;
