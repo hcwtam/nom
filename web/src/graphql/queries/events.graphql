@@ -1,0 +1,12 @@
+query Events {
+  events {
+    id
+    date
+    type
+    recipeId
+    recipe {
+      title
+      imageUrl
+    }
+  }
+}

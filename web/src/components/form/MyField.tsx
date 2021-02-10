@@ -27,13 +27,13 @@ export const MyField: React.FC<InputFieldProps> = ({
   size: _,
   ...props
 }) => {
-  const [field, { error }] = useField(props);
+  const [field, { error, touched }] = useField(props);
   return (
     <FormControl
       id={props.name}
       isRequired={isRequired}
       mb={4}
-      isInvalid={!!error}
+      isInvalid={!!error && touched}
     >
       {label ? <FormLabel htmlFor={field.name}>{label}</FormLabel> : null}
       {!textarea ? (
@@ -41,7 +41,7 @@ export const MyField: React.FC<InputFieldProps> = ({
       ) : (
         <Textarea placeholder={props.placeholder} {...field} {...props} />
       )}
-      {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
+      {error && touched ? <FormErrorMessage>{error}</FormErrorMessage> : null}
     </FormControl>
   );
 };

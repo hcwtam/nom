@@ -73,10 +73,10 @@ const Recipe = () => {
         </Text>
         <Text>
           Author:
-          <Text fontWeight="600" display="inline-block" ml={2}>
+          <Box as="span" fontWeight="600" display="inline-block" ml={2}>
             {' '}
             {data?.recipe.creator.username}
-          </Text>
+          </Box>
         </Text>
         <Text>{data?.recipe.description}</Text>
         <Box>

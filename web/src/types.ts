@@ -2,8 +2,8 @@ export type CreateRecipeInput = {
   title: string;
   description: string;
   imageUrl: string;
-  prepTime: number;
-  activeTime: number;
+  prepTime: string;
+  activeTime: string;
   steps: {
     description: string;
     step: number;
@@ -13,4 +13,11 @@ export type CreateRecipeInput = {
     quantity: undefined;
     unit: string;
   }[];
+};
+
+export type EventType = {
+  start: Date;
+  end: Date;
+  title: string;
+  resourceId: number;
 };

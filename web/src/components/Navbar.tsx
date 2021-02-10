@@ -36,6 +36,9 @@ export default function Navbar(): ReactElement {
           </>
         ) : (
           <>
+            <Button mr={4} onClick={() => router.push('/schedule')}>
+              Schedule
+            </Button>
             <Button mr={4} onClick={() => router.push('/recipes/create')}>
               Create
             </Button>
