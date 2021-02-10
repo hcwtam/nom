@@ -17,6 +17,9 @@ import { Upvote } from './entities/Upvote';
 import { createUserLoader } from './utils/createUserLoader';
 import { Ingredient } from './entities/Ingredient';
 import { Step } from './entities/Step';
+import { Event } from './entities/Event';
+import { createRecipeLoader } from './utils/createRecipeLoader';
+import { EventResolver } from './resolvers/event';
 
 const main = async () => {
   await createConnection({
@@ -26,11 +29,12 @@ const main = async () => {
     database: 'nom',
     logging: !__prod__,
     synchronize: true,
-    entities: [User, Upvote, Recipe, Ingredient, Step]
+    entities: [User, Upvote, Recipe, Ingredient, Step, Event]
     // dropSchema: true
   });
 
   // await Upvote.delete({});
+  // await Event.delete({});
   // await User.delete({});
   // await Recipe.delete({});
   // await Step.delete({});
@@ -66,14 +70,15 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [RecipeResolver, UserResolver],
+      resolvers: [RecipeResolver, UserResolver, EventResolver],
       validate: false
     }),
     context: ({ req, res }): MyContext => ({
       req,
       res,
       redis,
-      userLoader: createUserLoader()
+      userLoader: createUserLoader(),
+      recipeLoader: createRecipeLoader()
     })
   });
 

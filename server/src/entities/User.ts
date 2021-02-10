@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
+import { Event } from './Event';
 import { Recipe } from './Recipe';
 import { Upvote } from './Upvote';
 
@@ -42,4 +43,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Upvote, (upvote) => upvote.recipe)
   upvotes: Upvote[];
+
+  @OneToMany(() => Event, (event) => event.user)
+  events: Event[];
 }

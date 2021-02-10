@@ -21,6 +21,9 @@ const Upvote_1 = require("./entities/Upvote");
 const createUserLoader_1 = require("./utils/createUserLoader");
 const Ingredient_1 = require("./entities/Ingredient");
 const Step_1 = require("./entities/Step");
+const Event_1 = require("./entities/Event");
+const createRecipeLoader_1 = require("./utils/createRecipeLoader");
+const event_1 = require("./resolvers/event");
 const main = async () => {
     await typeorm_1.createConnection({
         type: 'postgres',
@@ -29,7 +32,7 @@ const main = async () => {
         database: 'nom',
         logging: !constants_1.__prod__,
         synchronize: true,
-        entities: [User_1.User, Upvote_1.Upvote, Recipe_1.Recipe, Ingredient_1.Ingredient, Step_1.Step]
+        entities: [User_1.User, Upvote_1.Upvote, Recipe_1.Recipe, Ingredient_1.Ingredient, Step_1.Step, Event_1.Event]
     });
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
@@ -53,14 +56,15 @@ const main = async () => {
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: await type_graphql_1.buildSchema({
-            resolvers: [recipe_1.RecipeResolver, user_1.UserResolver],
+            resolvers: [recipe_1.RecipeResolver, user_1.UserResolver, event_1.EventResolver],
             validate: false
         }),
         context: ({ req, res }) => ({
             req,
             res,
             redis,
-            userLoader: createUserLoader_1.createUserLoader()
+            userLoader: createUserLoader_1.createUserLoader(),
+            recipeLoader: createRecipeLoader_1.createRecipeLoader()
         })
     });
     apolloServer.applyMiddleware({
