@@ -59,19 +59,19 @@ export class EventResolver {
     return event;
   }
 
-  //   @Mutation(() => Recipe)
-  //   async updateRecipe(
-  //     @Arg('id') id: number,
-  //     @Arg('title') title: string
-  //   ): Promise<Recipe | null> {
-  //     const recipe = await Recipe.findOne(id);
-  //     if (!recipe) return null;
-  //     if (typeof title !== 'undefined') {
-  //       recipe.title = title;
-  //       await Recipe.save(recipe);
-  //     }
-  //     return recipe;
-  //   }
+  @Mutation(() => Event)
+  async updateEvent(
+    @Arg('id') id: number,
+    @Arg('date') date: string
+  ): Promise<Event | null> {
+    const event = await Event.findOne(id);
+    if (!event) return null;
+    if (typeof date !== 'undefined') {
+      event.date = date;
+      await Event.save(event);
+    }
+    return event;
+  }
 
   @Mutation(() => Boolean)
   async deleteEvent(@Arg('id') id: number): Promise<boolean> {
