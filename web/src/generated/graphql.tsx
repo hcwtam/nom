@@ -111,6 +111,7 @@ export type Mutation = {
   forgetPassword: Scalars['Boolean'];
   resetPassword: UserResponse;
   createEvent: Event;
+  updateEvent: Event;
   deleteEvent: Scalars['Boolean'];
 };
 
@@ -161,6 +162,12 @@ export type MutationResetPasswordArgs = {
 
 export type MutationCreateEventArgs = {
   input: EventInput;
+};
+
+
+export type MutationUpdateEventArgs = {
+  date: Scalars['String'];
+  id: Scalars['Float'];
 };
 
 
@@ -287,6 +294,20 @@ export type RegisterMutation = (
       { __typename?: 'User' }
       & Pick<User, 'username' | 'email' | 'id'>
     )> }
+  ) }
+);
+
+export type UpdateEventMutationVariables = Exact<{
+  id: Scalars['Float'];
+  date: Scalars['String'];
+}>;
+
+
+export type UpdateEventMutation = (
+  { __typename?: 'Mutation' }
+  & { updateEvent: (
+    { __typename?: 'Event' }
+    & Pick<Event, 'id' | 'date'>
   ) }
 );
 
@@ -546,6 +567,40 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const UpdateEventDocument = gql`
+    mutation UpdateEvent($id: Float!, $date: String!) {
+  updateEvent(id: $id, date: $date) {
+    id
+    date
+  }
+}
+    `;
+export type UpdateEventMutationFn = Apollo.MutationFunction<UpdateEventMutation, UpdateEventMutationVariables>;
+
+/**
+ * __useUpdateEventMutation__
+ *
+ * To run a mutation, you first call `useUpdateEventMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateEventMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateEventMutation, { data, loading, error }] = useUpdateEventMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      date: // value for 'date'
+ *   },
+ * });
+ */
+export function useUpdateEventMutation(baseOptions?: Apollo.MutationHookOptions<UpdateEventMutation, UpdateEventMutationVariables>) {
+        return Apollo.useMutation<UpdateEventMutation, UpdateEventMutationVariables>(UpdateEventDocument, baseOptions);
+      }
+export type UpdateEventMutationHookResult = ReturnType<typeof useUpdateEventMutation>;
+export type UpdateEventMutationResult = Apollo.MutationResult<UpdateEventMutation>;
+export type UpdateEventMutationOptions = Apollo.BaseMutationOptions<UpdateEventMutation, UpdateEventMutationVariables>;
 export const EventsDocument = gql`
     query Events {
   events {

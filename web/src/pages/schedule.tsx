@@ -1,6 +1,5 @@
 import { Button, Spinner } from '@chakra-ui/react';
-import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Calendar from '../components/calender/Calendar';
 import { Container } from '../components/Container';
 import { Main } from '../components/Main';
@@ -11,6 +10,8 @@ import { EventType } from '../types';
 const Schedule = () => {
   const { data, loading, error } = useEventsQuery();
   const [events, setEvents] = useState<EventType[] | null>(null);
+
+  console.log(data);
 
   const loadingScreen = (
     <Container>

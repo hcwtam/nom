@@ -10,6 +10,7 @@ import React, { ComponentClass, useState } from 'react';
 import { Text, Button, Flex } from '@chakra-ui/react';
 import { EventType } from '../../types';
 import { DeletePopover } from './DeletePopover';
+import { useUpdateEventMutation } from '../../generated/graphql';
 
 interface Props {
   events: EventType[];
@@ -24,14 +25,17 @@ const DnDCalendar = withDragAndDrop(
 const Calendar = ({ events, setEvents }: Props) => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [currentEventId, setCurrentEventId] = useState(0);
+  const [updateEvent] = useUpdateEventMutation();
 
-  const onEventDrop = (data: any) => {
+  const onEventDrop = async (data: any) => {
     const { start, end, event } = data;
     const id = event.resourceId;
     const newEvents = events.map((event) =>
       event.resourceId === id ? { ...event, start, end } : event
     );
     setEvents(newEvents);
+    const res = await updateEvent({ variables: { id, date: start } });
+    if (!res.data) setEvents((prev) => prev);
   };
 
   const onSelectSlot = (slotInfo: any) => {

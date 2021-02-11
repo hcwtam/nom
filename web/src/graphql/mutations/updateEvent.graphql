@@ -1,0 +1,6 @@
+mutation UpdateEvent($id: Float!, $date: String!) {
+  updateEvent(id: $id, date: $date) {
+    id
+    date
+  }
+}
