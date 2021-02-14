@@ -57,6 +57,7 @@ const Schedule = () => {
           onClose={onClose}
           setEvents={setEvents}
           selectedSlot={selectedSlot}
+          setSelectedSlot={setSelectedSlot}
         />
         <Button mb={10}>Generate grocery list</Button>
       </Main>

@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   GridItem,
   Input,
@@ -12,10 +13,12 @@ import {
   Select,
   Text
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useCreateEventMutation } from '../../generated/graphql';
 import { EventType } from '../../types';
 import SearchBar from '../searchBar/SearchBar';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface Props {
   isOpen: boolean;
@@ -25,6 +28,11 @@ interface Props {
   selectedSlot: {
     start: string;
   } | null;
+  setSelectedSlot: React.Dispatch<
+    React.SetStateAction<{
+      start: string;
+    } | null>
+  >;
 }
 
 export default function CalendarModal({
@@ -32,9 +40,13 @@ export default function CalendarModal({
   onOpen,
   onClose,
   setEvents,
-  selectedSlot
+  selectedSlot,
+  setSelectedSlot
 }: Props) {
   const [type, setType] = useState<string | null | undefined>(null);
+  const [date, setDate] = useState<Date | null | undefined>(new Date());
+  console.log(date);
+
   const [selectedRecipe, setSelectedRecipe] = useState<{
     value: string;
     label: string;
@@ -44,14 +56,14 @@ export default function CalendarModal({
 
   const submit = async () => {
     const localEvent = {
-      start: new Date(selectedSlot!.start),
-      end: new Date(selectedSlot!.start),
+      start: selectedSlot ? new Date(selectedSlot.start) : date!,
+      end: selectedSlot ? new Date(selectedSlot.start) : date!,
       title: selectedRecipe!.label,
       type: type!,
       resourceId: +selectedRecipe!.value
     };
     const event = {
-      date: selectedSlot!.start,
+      date: selectedSlot?.start || date!.toString(),
       type: type!,
       recipeId: +selectedRecipe!.value
     };
@@ -73,6 +85,7 @@ export default function CalendarModal({
   };
 
   const closeModal = () => {
+    setDate(null);
     setType(null);
     setSelectedRecipe(null);
     onClose();
@@ -88,21 +101,44 @@ export default function CalendarModal({
 
   return (
     <>
-      <Button onClick={onOpen}>Add recipe to calendar</Button>
+      <Button
+        onClick={() => {
+          setSelectedSlot(null);
+          setDate(new Date());
+          onOpen();
+        }}
+      >
+        Add recipe to calendar
+      </Button>
 
       <Modal isOpen={isOpen} onClose={closeModal}>
         <ModalOverlay bg="rgba(255, 255, 255, 0.2);" />
-        <ModalContent bg="#222">
+        <ModalContent bg="#222" mt="2.5rem">
           <ModalHeader textAlign="center">Add recipe to calendar</ModalHeader>
           <ModalCloseButton
             _hover={{ boxShadow: '0 0 5px #fff9ee' }}
             _focus={{ boxShadow: 'none' }}
           />
           <ModalBody>
-            <Text mt={4} mb={8} mx={4}>
+            <Text mb={6} mx={4}>
               Selected date:{' '}
-              <strong>{selectedSlot?.start.toString().substring(0, 15)}</strong>
+              <strong>
+                {selectedSlot?.start
+                  ? selectedSlot.start.toString().substring(0, 15)
+                  : date
+                  ? date.toString().substring(0, 15)
+                  : 'No date selected.'}
+              </strong>
             </Text>
+            {!selectedSlot ? (
+              <Box m="0 auto" textAlign="center">
+                <DatePicker
+                  selected={date}
+                  onChange={(input) => setDate(input as Date)}
+                  inline
+                />
+              </Box>
+            ) : null}
             <Text mt={4} mx={4}>
               Selected recipe:{' '}
               <strong>
@@ -124,7 +160,9 @@ export default function CalendarModal({
               w="100%"
               my={4}
               type="submit"
-              disabled={!selectedSlot?.start || !selectedRecipe || !type}
+              disabled={
+                !(selectedSlot?.start || date) || !selectedRecipe || !type
+              }
               onClick={submit}
             >
               Submit
