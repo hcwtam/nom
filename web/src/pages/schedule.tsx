@@ -1,6 +1,7 @@
-import { Button, Spinner } from '@chakra-ui/react';
+import { Button, Spinner, useDisclosure } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import Calendar from '../components/calender/Calendar';
+import CalendarModal from '../components/calender/CalendarModal';
 import { Container } from '../components/Container';
 import { Main } from '../components/Main';
 import Navbar from '../components/Navbar';
@@ -10,8 +11,10 @@ import { EventType } from '../types';
 const Schedule = () => {
   const { data, loading, error } = useEventsQuery();
   const [events, setEvents] = useState<EventType[] | null>(null);
-
-  console.log(data);
+  const [selectedSlot, setSelectedSlot] = useState<{ start: string } | null>(
+    null
+  );
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const loadingScreen = (
     <Container>
@@ -31,6 +34,7 @@ const Schedule = () => {
       start: new Date(event.date),
       end: new Date(event.date),
       title: event.recipe.title,
+      type: event.type,
       resourceId: event.id
     }));
   if (!events && eventsFromQuery) {
@@ -41,8 +45,19 @@ const Schedule = () => {
     <Container>
       <Navbar />
       <Main>
-        <Calendar events={events} setEvents={setEvents} />
-        <Button>Add recipe to calendar</Button>
+        <Calendar
+          events={events}
+          setEvents={setEvents}
+          onOpen={onOpen}
+          setSelectedSlot={setSelectedSlot}
+        />
+        <CalendarModal
+          isOpen={isOpen}
+          onOpen={onOpen}
+          onClose={onClose}
+          setEvents={setEvents}
+          selectedSlot={selectedSlot}
+        />
         <Button mb={10}>Generate grocery list</Button>
       </Main>
     </Container>

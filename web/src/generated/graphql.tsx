@@ -18,6 +18,7 @@ export type Query = {
   recipes: PagninatedRecipes;
   recipe: Recipe;
   paths: Array<Recipe>;
+  search: Array<Recipe>;
   me?: Maybe<User>;
   events: Array<Event>;
 };
@@ -31,6 +32,11 @@ export type QueryRecipesArgs = {
 
 export type QueryRecipeArgs = {
   id: Scalars['Float'];
+};
+
+
+export type QuerySearchArgs = {
+  title: Scalars['String'];
 };
 
 export type PagninatedRecipes = {
@@ -225,6 +231,19 @@ export type RegularUserFragment = (
   & Pick<User, 'id' | 'username'>
 );
 
+export type CreateEventMutationVariables = Exact<{
+  input: EventInput;
+}>;
+
+
+export type CreateEventMutation = (
+  { __typename?: 'Mutation' }
+  & { createEvent: (
+    { __typename?: 'Event' }
+    & Pick<Event, 'type' | 'date' | 'recipeId' | 'userId'>
+  ) }
+);
+
 export type CreateRecipeMutationVariables = Exact<{
   input: RecipeInput;
 }>;
@@ -386,12 +405,58 @@ export type RecipesQuery = (
   ) }
 );
 
+export type SearchQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SearchQuery = (
+  { __typename?: 'Query' }
+  & { paths: Array<(
+    { __typename?: 'Recipe' }
+    & Pick<Recipe, 'id' | 'title'>
+  )> }
+);
+
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
   username
 }
     `;
+export const CreateEventDocument = gql`
+    mutation CreateEvent($input: EventInput!) {
+  createEvent(input: $input) {
+    type
+    date
+    recipeId
+    userId
+  }
+}
+    `;
+export type CreateEventMutationFn = Apollo.MutationFunction<CreateEventMutation, CreateEventMutationVariables>;
+
+/**
+ * __useCreateEventMutation__
+ *
+ * To run a mutation, you first call `useCreateEventMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateEventMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createEventMutation, { data, loading, error }] = useCreateEventMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateEventMutation(baseOptions?: Apollo.MutationHookOptions<CreateEventMutation, CreateEventMutationVariables>) {
+        return Apollo.useMutation<CreateEventMutation, CreateEventMutationVariables>(CreateEventDocument, baseOptions);
+      }
+export type CreateEventMutationHookResult = ReturnType<typeof useCreateEventMutation>;
+export type CreateEventMutationResult = Apollo.MutationResult<CreateEventMutation>;
+export type CreateEventMutationOptions = Apollo.BaseMutationOptions<CreateEventMutation, CreateEventMutationVariables>;
 export const CreateRecipeDocument = gql`
     mutation CreateRecipe($input: RecipeInput!) {
   createRecipe(input: $input) {
@@ -795,3 +860,36 @@ export function useRecipesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Re
 export type RecipesQueryHookResult = ReturnType<typeof useRecipesQuery>;
 export type RecipesLazyQueryHookResult = ReturnType<typeof useRecipesLazyQuery>;
 export type RecipesQueryResult = Apollo.QueryResult<RecipesQuery, RecipesQueryVariables>;
+export const SearchDocument = gql`
+    query Search {
+  paths {
+    id
+    title
+  }
+}
+    `;
+
+/**
+ * __useSearchQuery__
+ *
+ * To run a query within a React component, call `useSearchQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSearchQuery(baseOptions?: Apollo.QueryHookOptions<SearchQuery, SearchQueryVariables>) {
+        return Apollo.useQuery<SearchQuery, SearchQueryVariables>(SearchDocument, baseOptions);
+      }
+export function useSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchQuery, SearchQueryVariables>) {
+          return Apollo.useLazyQuery<SearchQuery, SearchQueryVariables>(SearchDocument, baseOptions);
+        }
+export type SearchQueryHookResult = ReturnType<typeof useSearchQuery>;
+export type SearchLazyQueryHookResult = ReturnType<typeof useSearchLazyQuery>;
+export type SearchQueryResult = Apollo.QueryResult<SearchQuery, SearchQueryVariables>;

@@ -1,0 +1,6 @@
+query Search {
+  paths {
+    id
+    title
+  }
+}

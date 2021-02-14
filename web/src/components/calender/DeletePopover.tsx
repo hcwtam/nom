@@ -9,14 +9,23 @@ import {
 } from '@chakra-ui/react';
 import React, { useRef } from 'react';
 import { useDeleteEventMutation } from '../../generated/graphql';
+import { EventType } from '../../types';
 
 interface Props {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  events: EventType[];
+  setEvents: React.Dispatch<React.SetStateAction<EventType[] | null>>;
   id: number;
 }
 
-export const DeletePopover = ({ isOpen, setIsOpen, id }: Props) => {
+export const DeletePopover = ({
+  isOpen,
+  events,
+  setEvents,
+  setIsOpen,
+  id
+}: Props) => {
   const onClose = () => setIsOpen(false);
   const cancelRef = useRef<any>();
   const [deleteEvent] = useDeleteEventMutation();
@@ -44,8 +53,16 @@ export const DeletePopover = ({ isOpen, setIsOpen, id }: Props) => {
             <Button
               colorScheme="red"
               onClick={async () => {
-                await deleteEvent({ variables: { id } });
-                onClose();
+                await deleteEvent({
+                  variables: { id },
+                  update: (cache) => {
+                    cache.evict({ id: `Event:${id}` });
+                    onClose();
+                    setEvents(
+                      events.filter((event) => event.resourceId !== id)
+                    );
+                  }
+                });
               }}
               ml={3}
             >

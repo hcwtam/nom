@@ -1,0 +1,8 @@
+mutation CreateEvent($input: EventInput!) {
+  createEvent(input: $input) {
+    type
+    date
+    recipeId
+    userId
+  }
+}
