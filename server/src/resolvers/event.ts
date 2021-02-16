@@ -62,12 +62,17 @@ export class EventResolver {
   @Mutation(() => Event)
   async updateEvent(
     @Arg('id') id: number,
-    @Arg('date') date: string
+    @Arg('date', { nullable: true }) date: string,
+    @Arg('type', { nullable: true }) type: string
   ): Promise<Event | null> {
     const event = await Event.findOne(id);
     if (!event) return null;
-    if (typeof date !== 'undefined') {
+    if (date && typeof date !== 'undefined') {
       event.date = date;
+      await Event.save(event);
+    }
+    if (type && typeof type !== 'undefined') {
+      event.type = type;
       await Event.save(event);
     }
     return event;

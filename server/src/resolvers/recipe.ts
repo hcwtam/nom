@@ -14,7 +14,7 @@ import {
 } from 'type-graphql';
 import { MyContext } from '../types';
 import { isAuth } from '../middleware/isAuth';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { Upvote } from '../entities/Upvote';
 import { User } from '../entities/User';
 import { RecipeInput } from './types';
@@ -183,5 +183,14 @@ export class RecipeResolver {
   @Query(() => [Recipe])
   async paths(): Promise<Recipe[]> {
     return Recipe.find();
+  }
+
+  @Query(() => [Recipe])
+  async search(@Arg('title') title: string): Promise<Recipe[]> {
+    return getRepository(Recipe)
+      .createQueryBuilder()
+      .select()
+      .where('title ILIKE :title', { title: `%${title}%` })
+      .getMany();
   }
 }
