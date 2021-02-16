@@ -1,8 +1,6 @@
 import {
   Box,
   Button,
-  GridItem,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,

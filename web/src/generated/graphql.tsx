@@ -172,7 +172,8 @@ export type MutationCreateEventArgs = {
 
 
 export type MutationUpdateEventArgs = {
-  date: Scalars['String'];
+  type?: Maybe<Scalars['String']>;
+  date?: Maybe<Scalars['String']>;
   id: Scalars['Float'];
 };
 
@@ -318,7 +319,8 @@ export type RegisterMutation = (
 
 export type UpdateEventMutationVariables = Exact<{
   id: Scalars['Float'];
-  date: Scalars['String'];
+  date?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -326,7 +328,7 @@ export type UpdateEventMutation = (
   { __typename?: 'Mutation' }
   & { updateEvent: (
     { __typename?: 'Event' }
-    & Pick<Event, 'id' | 'date'>
+    & Pick<Event, 'id' | 'date' | 'type'>
   ) }
 );
 
@@ -341,6 +343,10 @@ export type EventsQuery = (
     & { recipe: (
       { __typename?: 'Recipe' }
       & Pick<Recipe, 'title' | 'imageUrl'>
+      & { ingredients: Array<(
+        { __typename?: 'Ingredient' }
+        & Pick<Ingredient, 'name' | 'quantity' | 'unit'>
+      )> }
     ) }
   )> }
 );
@@ -633,10 +639,11 @@ export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const UpdateEventDocument = gql`
-    mutation UpdateEvent($id: Float!, $date: String!) {
-  updateEvent(id: $id, date: $date) {
+    mutation UpdateEvent($id: Float!, $date: String, $type: String) {
+  updateEvent(id: $id, date: $date, type: $type) {
     id
     date
+    type
   }
 }
     `;
@@ -657,6 +664,7 @@ export type UpdateEventMutationFn = Apollo.MutationFunction<UpdateEventMutation,
  *   variables: {
  *      id: // value for 'id'
  *      date: // value for 'date'
+ *      type: // value for 'type'
  *   },
  * });
  */
@@ -676,6 +684,11 @@ export const EventsDocument = gql`
     recipe {
       title
       imageUrl
+      ingredients {
+        name
+        quantity
+        unit
+      }
     }
   }
 }

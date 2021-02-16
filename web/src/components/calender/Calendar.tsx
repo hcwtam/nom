@@ -7,10 +7,11 @@ import {
 import moment from 'moment';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import React, { ComponentClass, useState } from 'react';
-import { Text, Button, Flex } from '@chakra-ui/react';
+import { Text, Button, Flex, useDisclosure } from '@chakra-ui/react';
 import { EventType } from '../../types';
-import { DeletePopover } from './DeletePopover';
 import { useUpdateEventMutation } from '../../generated/graphql';
+import EventModal from './EventModal';
+import { stylingEvent } from '../../utils/utils';
 
 interface Props {
   events: EventType[];
@@ -25,27 +26,23 @@ interface Props {
 
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(
-  reactBigCalendar as ComponentClass<CalendarProps<object, object>, any>
+  reactBigCalendar as ComponentClass<CalendarProps<EventType, object>, any>
 );
 
-// function changing event background color by type
-const stylingEvent = ({ type }: any) => {
-  let background;
-  if (type === 'breakfast') background = 'orange';
-  if (type === 'lunch') background = 'green';
-  if (type === 'dinner') background = '#296fbe';
-  if (type === 'snack') background = '#be2929';
-  return { style: { background } };
-};
-
 const Calendar = ({ events, setEvents, onOpen, setSelectedSlot }: Props) => {
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [currentEventId, setCurrentEventId] = useState(0);
+  const {
+    isOpen: isEMOpen,
+    onOpen: onEMOpen,
+    onClose: onEMClose
+  } = useDisclosure();
+
+  const [currentEvent, setCurrentEvent] = useState<EventType | null>(null);
   const [updateEvent] = useUpdateEventMutation();
 
   const onEventDrop = async (data: any) => {
     const { start, end, event } = data;
     const id = event.resourceId;
+
     const newEvents = events.map((event) =>
       event.resourceId === id ? { ...event, start, end } : event
     );
@@ -92,9 +89,9 @@ const Calendar = ({ events, setEvents, onOpen, setSelectedSlot }: Props) => {
         }}
         localizer={localizer}
         onEventDrop={onEventDrop}
-        onSelectEvent={({ resourceId }: any) => {
-          setIsDeleteOpen(true);
-          setCurrentEventId(resourceId);
+        onSelectEvent={(event: EventType) => {
+          setCurrentEvent(event);
+          onEMOpen();
         }}
         onSelectSlot={onSelectSlot}
         resizable={false}
@@ -107,12 +104,13 @@ const Calendar = ({ events, setEvents, onOpen, setSelectedSlot }: Props) => {
         }}
         views={['month']}
       />
-      <DeletePopover
-        isOpen={isDeleteOpen}
-        setIsOpen={setIsDeleteOpen}
-        events={events}
+
+      <EventModal
+        isOpen={isEMOpen}
+        onOpen={onEMOpen}
+        onClose={onEMClose}
+        event={currentEvent}
         setEvents={setEvents}
-        id={currentEventId}
       />
     </>
   );

@@ -2,11 +2,13 @@ import { Button, Spinner, useDisclosure } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import Calendar from '../components/calender/Calendar';
 import CalendarModal from '../components/calender/CalendarModal';
+import GenFileModal from '../components/calender/GenFileModal';
 import { Container } from '../components/Container';
 import { Main } from '../components/Main';
 import Navbar from '../components/Navbar';
-import { useEventsQuery } from '../generated/graphql';
+import { useEventsQuery, Event } from '../generated/graphql';
 import { EventType } from '../types';
+import { transformToCalendarEvent } from '../utils/utils';
 
 const Schedule = () => {
   const { data, loading, error } = useEventsQuery();
@@ -15,6 +17,11 @@ const Schedule = () => {
     null
   );
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isGenModalOpen,
+    onOpen: onGenModaOpen,
+    onClose: onGenModaClose
+  } = useDisclosure();
 
   const loadingScreen = (
     <Container>
@@ -28,15 +35,9 @@ const Schedule = () => {
   if (error)
     return <Container>We have trouble getting your schedule.</Container>;
 
-  let eventsFromQuery: any;
+  let eventsFromQuery: EventType[] | undefined;
   if (data && data.events)
-    eventsFromQuery = data.events.map((event) => ({
-      start: new Date(event.date),
-      end: new Date(event.date),
-      title: event.recipe.title,
-      type: event.type,
-      resourceId: event.id
-    }));
+    eventsFromQuery = transformToCalendarEvent(data.events as Event[]);
   if (!events && eventsFromQuery) {
     setEvents(eventsFromQuery);
   }
@@ -59,7 +60,10 @@ const Schedule = () => {
           selectedSlot={selectedSlot}
           setSelectedSlot={setSelectedSlot}
         />
-        <Button mb={10}>Generate grocery list</Button>
+        <GenFileModal isOpen={isGenModalOpen} onClose={onGenModaClose} />
+        <Button mb={10} onClick={() => onGenModaOpen()}>
+          Generate grocery list
+        </Button>
       </Main>
     </Container>
   ) : (

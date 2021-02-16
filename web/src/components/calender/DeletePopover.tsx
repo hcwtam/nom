@@ -14,17 +14,17 @@ import { EventType } from '../../types';
 interface Props {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  events: EventType[];
   setEvents: React.Dispatch<React.SetStateAction<EventType[] | null>>;
-  id: number;
+  id: number | undefined;
+  closeModal: () => void;
 }
 
 export const DeletePopover = ({
   isOpen,
-  events,
   setEvents,
   setIsOpen,
-  id
+  id,
+  closeModal
 }: Props) => {
   const onClose = () => setIsOpen(false);
   const cancelRef = useRef<any>();
@@ -36,8 +36,8 @@ export const DeletePopover = ({
       leastDestructiveRef={cancelRef}
       onClose={onClose}
     >
-      <AlertDialogOverlay>
-        <AlertDialogContent>
+      <AlertDialogOverlay bg="rgba(255, 255, 255, 0.2);">
+        <AlertDialogContent bg="#222" mt="5.5rem">
           <AlertDialogHeader fontSize="lg" fontWeight="bold">
             Delete Recipe
           </AlertDialogHeader>
@@ -54,19 +54,20 @@ export const DeletePopover = ({
               colorScheme="red"
               onClick={async () => {
                 await deleteEvent({
-                  variables: { id },
+                  variables: { id: id! },
                   update: (cache) => {
                     cache.evict({ id: `Event:${id}` });
                     onClose();
-                    setEvents(
-                      events.filter((event) => event.resourceId !== id)
+                    closeModal();
+                    setEvents((prev) =>
+                      prev!.filter((event) => event.resourceId !== id)
                     );
                   }
                 });
               }}
               ml={3}
             >
-              Delete
+              Confirm
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

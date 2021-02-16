@@ -8,7 +8,8 @@ import {
   OrderedList,
   UnorderedList,
   ListItem,
-  Box
+  Box,
+  Button
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import {
@@ -21,6 +22,9 @@ import {
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { initializeApollo } from '../../lib/apollo';
 import Navbar from '../../components/Navbar';
+import React from 'react';
+import CopyArea from '../../components/CopyArea';
+import { generateTextFile } from '../../utils/utils';
 
 const Recipe = () => {
   const router = useRouter();
@@ -42,17 +46,22 @@ const Recipe = () => {
       </Container>
     );
 
-  let steps, ingredients;
+  let steps,
+    ingredients,
+    content: string[] = [];
   if (data) {
     steps = data.recipe.steps.map((step) => (
       <ListItem key={step.step}>{step.description}</ListItem>
     ));
 
-    ingredients = data.recipe.ingredients.map((ingredient) => (
-      <ListItem key={ingredient.name}>
-        {ingredient.quantity} {ingredient.unit} {ingredient.name}
-      </ListItem>
-    ));
+    ingredients = data.recipe.ingredients.map((ingredient) => {
+      const ingItem =
+        (ingredient.quantity ? ingredient.quantity + ' ' : '') +
+        (ingredient.unit ? ingredient.unit + ' ' : '') +
+        ingredient.name;
+      content.push(ingItem);
+      return <ListItem key={ingredient.name}>{ingItem}</ListItem>;
+    });
   }
   return (
     <Container pb={50}>
@@ -84,6 +93,23 @@ const Recipe = () => {
             Ingredients
           </Text>
           <UnorderedList>{ingredients}</UnorderedList>
+          <Text mt={8} mb={4}>
+            Copy ingredients to clipboard:
+          </Text>
+          <CopyArea content={content.join('\n')} />
+          <Text mt={8} mb={4}>
+            Or download grocery list as text file:
+          </Text>
+          <Button
+            w="100%"
+            colorScheme="orange"
+            bg="orange.500"
+            color="white"
+            opacity={0.8}
+            onClick={() => generateTextFile(content.join('\n'))}
+          >
+            Generate grocery list
+          </Button>
         </Box>
         <Flex w="100%">
           <Box>

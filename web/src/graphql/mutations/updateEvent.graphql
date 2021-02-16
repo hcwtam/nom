@@ -1,6 +1,7 @@
-mutation UpdateEvent($id: Float!, $date: String!) {
-  updateEvent(id: $id, date: $date) {
+mutation UpdateEvent($id: Float!, $date: String, $type: String) {
+  updateEvent(id: $id, date: $date, type: $type) {
     id
     date
+    type
   }
 }

@@ -20,4 +20,7 @@ export type EventType = {
   end: Date;
   title: string;
   resourceId: number;
+  type?: string;
+  imageUrl?: string | null | undefined;
+  recipeId?: number | null | undefined;
 };
