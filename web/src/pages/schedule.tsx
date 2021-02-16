@@ -19,8 +19,8 @@ const Schedule = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isGenModalOpen,
-    onOpen: onGenModaOpen,
-    onClose: onGenModaClose
+    onOpen: onGenModalOpen,
+    onClose: onGenModalClose
   } = useDisclosure();
 
   const loadingScreen = (
@@ -60,8 +60,8 @@ const Schedule = () => {
           selectedSlot={selectedSlot}
           setSelectedSlot={setSelectedSlot}
         />
-        <GenFileModal isOpen={isGenModalOpen} onClose={onGenModaClose} />
-        <Button mb={10} onClick={() => onGenModaOpen()}>
+        <GenFileModal isOpen={isGenModalOpen} onClose={onGenModalClose} />
+        <Button mb={10} onClick={() => onGenModalOpen()}>
           Generate grocery list
         </Button>
       </Main>

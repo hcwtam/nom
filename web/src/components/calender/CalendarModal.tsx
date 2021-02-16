@@ -43,7 +43,6 @@ export default function CalendarModal({
 }: Props) {
   const [type, setType] = useState<string | null | undefined>(null);
   const [date, setDate] = useState<Date | null | undefined>(new Date());
-  console.log(date);
 
   const [selectedRecipe, setSelectedRecipe] = useState<{
     value: string;

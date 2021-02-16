@@ -24,7 +24,7 @@ import { initializeApollo } from '../../lib/apollo';
 import Navbar from '../../components/Navbar';
 import React from 'react';
 import CopyArea from '../../components/CopyArea';
-import { generateTextFile } from '../../utils/utils';
+import { createIngredientString, generateTextFile } from '../../utils/utils';
 
 const Recipe = () => {
   const router = useRouter();
@@ -55,10 +55,7 @@ const Recipe = () => {
     ));
 
     ingredients = data.recipe.ingredients.map((ingredient) => {
-      const ingItem =
-        (ingredient.quantity ? ingredient.quantity + ' ' : '') +
-        (ingredient.unit ? ingredient.unit + ' ' : '') +
-        ingredient.name;
+      const ingItem = createIngredientString(ingredient);
       content.push(ingItem);
       return <ListItem key={ingredient.name}>{ingItem}</ListItem>;
     });

@@ -24,6 +24,8 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import { useEventsQuery, Event } from '../../generated/graphql';
 import { EventType } from '../../types';
 import {
+  compileIngredientsToText,
+  createIngredientString,
   generateTextFile,
   stylingEvent,
   transformToCalendarEvent
@@ -104,14 +106,8 @@ const GenFileModal = ({ isOpen, onClose }: Props) => {
     const selectedEvents = data?.events?.filter((e) =>
       selectedDates.includes(new Date(e.date).toString())
     );
-
-    const text = selectedEvents
-      ?.map((event) =>
-        event.recipe.ingredients.map((ing) => ing.name).join('\n')
-      )
-      .join('\n');
+    const text = compileIngredientsToText(selectedEvents as Event[]);
     if (text) generateTextFile(text);
-    console.log(selectedEvents);
   };
 
   const closeModal = () => {
