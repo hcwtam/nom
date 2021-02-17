@@ -17,7 +17,6 @@ const ioredis_1 = __importDefault(require("ioredis"));
 const express_session_1 = __importDefault(require("express-session"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const cors_1 = __importDefault(require("cors"));
-const Upvote_1 = require("./entities/Upvote");
 const createUserLoader_1 = require("./utils/createUserLoader");
 const Ingredient_1 = require("./entities/Ingredient");
 const Step_1 = require("./entities/Step");
@@ -32,7 +31,7 @@ const main = async () => {
         database: 'nom',
         logging: !constants_1.__prod__,
         synchronize: true,
-        entities: [User_1.User, Upvote_1.Upvote, Recipe_1.Recipe, Ingredient_1.Ingredient, Step_1.Step, Event_1.Event]
+        entities: [User_1.User, Recipe_1.Recipe, Ingredient_1.Ingredient, Step_1.Step, Event_1.Event]
     });
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);

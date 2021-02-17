@@ -11,7 +11,6 @@ import {
 } from 'typeorm';
 import { Ingredient } from './Ingredient';
 import { Step } from './Step';
-import { Upvote } from './Upvote';
 import { User } from './User';
 
 @ObjectType()
@@ -42,10 +41,6 @@ export class Recipe extends BaseEntity {
   imageUrl?: string;
 
   @Field()
-  @Column({ type: 'int', default: 0 })
-  points: number;
-
-  @Field()
   @Column()
   prepTime: number;
 
@@ -59,9 +54,6 @@ export class Recipe extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.recipes)
   creator: User;
-
-  @OneToMany(() => Upvote, (upvote) => upvote.recipe)
-  upvotes: Upvote[];
 
   @Field(() => [Step])
   @OneToMany(() => Step, (step) => step.recipe)

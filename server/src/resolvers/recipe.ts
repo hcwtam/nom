@@ -15,7 +15,6 @@ import {
 import { MyContext } from '../types';
 import { isAuth } from '../middleware/isAuth';
 import { getConnection, getRepository } from 'typeorm';
-import { Upvote } from '../entities/Upvote';
 import { User } from '../entities/User';
 import { RecipeInput } from './types';
 import { Step } from '../entities/Step';
@@ -125,58 +124,6 @@ export class RecipeResolver {
   @Mutation(() => Recipe)
   async deleteRecipe(@Arg('id') id: number): Promise<boolean> {
     await Recipe.delete(id);
-    return true;
-  }
-
-  @Mutation(() => Boolean)
-  @UseMiddleware(isAuth)
-  async vote(
-    @Arg('recipeId', () => Int) recipeId: number,
-    @Arg('value', () => Int) value: number,
-    @Ctx() { req }: MyContext
-  ) {
-    const isUpvote = value !== -1;
-    const updatedValue = isUpvote ? 1 : -1;
-    const userId = req.session.userId;
-
-    // check if user has voted before
-    const upvote = await Upvote.findOne({ where: { recipeId, userId } });
-    if (upvote && upvote.value !== updatedValue) {
-      //user changing their vote
-      getConnection().transaction(async (tm) => {
-        await tm.query(
-          `
-          update upvote
-          set value = $1
-          where "recipeId" = $2 and "userId" = $3
-`,
-          [updatedValue, recipeId, userId]
-        );
-
-        await tm.query(
-          `
-          update recipe
-          set points = points + $1
-          where id = $2
-`,
-          [2 * updatedValue, recipeId]
-        );
-      });
-    } else if (!upvote) {
-      //user never voted before
-      getConnection().transaction(async (tm) => {
-        await tm.query(`
-          insert into upvote ("userId", "recipeId", value)
-          values (${userId},${recipeId},${updatedValue})
-`);
-        await tm.query(`
-          update recipe
-          set points = points + ${updatedValue}
-          where id = ${recipeId};
-`);
-      });
-    }
-
     return true;
   }
 

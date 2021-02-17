@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import { Event } from './Event';
 import { Recipe } from './Recipe';
-import { Upvote } from './Upvote';
 
 @ObjectType()
 @Entity()
@@ -40,9 +39,6 @@ export class User extends BaseEntity {
   @Field(() => String)
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @OneToMany(() => Upvote, (upvote) => upvote.recipe)
-  upvotes: Upvote[];
 
   @OneToMany(() => Event, (event) => event.user)
   events: Event[];

@@ -1,4 +1,6 @@
 import 'reflect-metadata';
+import 'dotenv-safe/config';
+import path from 'path';
 import { createConnection } from 'typeorm';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
@@ -13,7 +15,6 @@ import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { MyContext } from './types';
 import cors from 'cors';
-import { Upvote } from './entities/Upvote';
 import { createUserLoader } from './utils/createUserLoader';
 import { Ingredient } from './entities/Ingredient';
 import { Step } from './entities/Step';
@@ -22,32 +23,27 @@ import { createRecipeLoader } from './utils/createRecipeLoader';
 import { EventResolver } from './resolvers/event';
 
 const main = async () => {
-  await createConnection({
+  const connection = await createConnection({
     type: 'postgres',
-    username: 'postgres',
-    password: 'postgres',
-    database: 'nom',
+    url: process.env.POSTGRES_URL,
     logging: !__prod__,
-    synchronize: true,
-    entities: [User, Upvote, Recipe, Ingredient, Step, Event]
-    // dropSchema: true
+    migrations: [path.join(__dirname, './migrations/*')],
+    // synchronize: true,
+    entities: [User, Recipe, Ingredient, Step, Event]
   });
 
-  // await Upvote.delete({});
-  // await Event.delete({});
-  // await User.delete({});
-  // await Recipe.delete({});
-  // await Step.delete({});
-  // await Ingredient.delete({});
+  await connection.runMigrations();
 
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redis = new Redis();
+  const redis = new Redis(process.env.REDIS_URL);
+
+  app.set('proxy', 1);
 
   app.use(
     cors({
-      origin: 'http://localhost:3000',
+      origin: process.env.CORS_ORIGIN,
       credentials: true
     })
   );
@@ -56,7 +52,7 @@ const main = async () => {
     session({
       store: new RedisStore({ client: redis, disableTouch: true }),
       name: COOKIE_NAME,
-      secret: 'ujyiuyyfbtyjhghgffghjj',
+      secret: process.env.SESSION_SECRET!,
       resave: false,
       saveUninitialized: false,
       cookie: {
@@ -87,7 +83,7 @@ const main = async () => {
     cors: false
   });
 
-  app.listen(4000, () => {
+  app.listen(parseInt(process.env.PORT!), () => {
     console.log('server up and running');
   });
 };
