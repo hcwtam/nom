@@ -25,7 +25,7 @@ import { EventResolver } from './resolvers/event';
 const main = async () => {
   const connection = await createConnection({
     type: 'postgres',
-    url: process.env.POSTGRES_URL,
+    url: process.env.DATABASE_URL,
     logging: !__prod__,
     migrations: [path.join(__dirname, './migrations/*')],
     // synchronize: true,
