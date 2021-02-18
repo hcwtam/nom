@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 require("dotenv-safe/config");
-const path_1 = __importDefault(require("path"));
 const typeorm_1 = require("typeorm");
 const express_1 = __importDefault(require("express"));
 const apollo_server_express_1 = require("apollo-server-express");
@@ -26,14 +25,18 @@ const Event_1 = require("./entities/Event");
 const createRecipeLoader_1 = require("./utils/createRecipeLoader");
 const event_1 = require("./resolvers/event");
 const main = async () => {
-    const connection = await typeorm_1.createConnection({
+    await typeorm_1.createConnection({
         type: 'postgres',
-        url: process.env.POSTGRES_URL,
+        url: process.env.DATABASE_URL,
         logging: !constants_1.__prod__,
-        migrations: [path_1.default.join(__dirname, './migrations/*')],
+        synchronize: true,
         entities: [User_1.User, Recipe_1.Recipe, Ingredient_1.Ingredient, Step_1.Step, Event_1.Event]
     });
-    await connection.runMigrations();
+    await User_1.User.delete({});
+    await Recipe_1.Recipe.delete({});
+    await Ingredient_1.Ingredient.delete({});
+    await Step_1.Step.delete({});
+    await Event_1.Event.delete({});
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
     const redis = new ioredis_1.default(process.env.REDIS_URL);

@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import 'dotenv-safe/config';
-import path from 'path';
 import { createConnection } from 'typeorm';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
@@ -23,16 +22,21 @@ import { createRecipeLoader } from './utils/createRecipeLoader';
 import { EventResolver } from './resolvers/event';
 
 const main = async () => {
-  const connection = await createConnection({
+  await createConnection({
     type: 'postgres',
     url: process.env.DATABASE_URL,
     logging: !__prod__,
-    migrations: [path.join(__dirname, './migrations/*')],
-    // synchronize: true,
+    // migrations: [path.join(__dirname, './migrations/*')],
+    synchronize: true,
     entities: [User, Recipe, Ingredient, Step, Event]
   });
 
-  await connection.runMigrations();
+  // await connection.runMigrations();
+  await User.delete({});
+  await Recipe.delete({});
+  await Ingredient.delete({});
+  await Step.delete({});
+  await Event.delete({});
 
   const app = express();
 
