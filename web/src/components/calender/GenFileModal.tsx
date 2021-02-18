@@ -25,7 +25,6 @@ import { useEventsQuery, Event } from '../../generated/graphql';
 import { EventType } from '../../types';
 import {
   compileIngredientsToText,
-  createIngredientString,
   generateTextFile,
   stylingEvent,
   transformToCalendarEvent

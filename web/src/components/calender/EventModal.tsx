@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Flex,
   Image,
@@ -31,7 +30,6 @@ interface Props {
 
 export default function EventModal({
   isOpen,
-  onOpen,
   onClose,
   event,
   setEvents
