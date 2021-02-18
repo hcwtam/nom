@@ -1,5 +1,5 @@
-query Recipes {
-  recipes(limit: 10) {
+query Recipes($cursor: String!) {
+  recipes(limit: 12, cursor: $cursor) {
     recipes {
       id
       title
@@ -7,6 +7,7 @@ query Recipes {
       prepTime
       activeTime
       imageUrl
+      createdAt
     }
     hasMore
   }

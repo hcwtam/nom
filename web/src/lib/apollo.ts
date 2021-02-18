@@ -5,9 +5,9 @@ import {
   InMemoryCache,
   NormalizedCacheObject
 } from '@apollo/client';
-import { concatPagination } from '@apollo/client/utilities';
 import merge from 'deepmerge';
 import isEqual from 'lodash/isEqual';
+import { PagninatedRecipes } from '../generated/graphql';
 
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 
@@ -18,7 +18,26 @@ function createApolloClient() {
       uri: 'http://localhost:4000/graphql', // Server URL (must be absolute)
       credentials: 'include' // Additional fetch() options like `credentials` or `headers`
     }),
-    cache: new InMemoryCache()
+    cache: new InMemoryCache({
+      typePolicies: {
+        Query: {
+          fields: {
+            recipes: {
+              keyArgs: [],
+              merge(
+                existing: PagninatedRecipes | undefined,
+                incoming: PagninatedRecipes
+              ): PagninatedRecipes {
+                return {
+                  ...incoming,
+                  recipes: [...(existing?.recipes || []), ...incoming.recipes]
+                };
+              }
+            }
+          }
+        }
+      }
+    })
   });
 }
 

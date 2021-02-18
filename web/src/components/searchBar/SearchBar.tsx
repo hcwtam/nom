@@ -43,8 +43,6 @@ export default function SearchBar({ selectResult }: Props) {
   const [inputItems, setInputItems] = useState<Item[]>([]);
   const [recipes, setRecipes] = useState<Item[]>([]);
 
-  console.log(recipes);
-
   useEffect(() => {
     if (data?.paths) {
       setInputItems(

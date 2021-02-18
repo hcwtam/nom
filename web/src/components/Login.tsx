@@ -7,7 +7,8 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useDisclosure
+  useDisclosure,
+  useMediaQuery
 } from '@chakra-ui/react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { MeDocument, MeQuery, useLoginMutation } from '../generated/graphql';
@@ -20,6 +21,7 @@ type inputValues = {
 };
 
 export default function Login() {
+  const [isLargerThan640] = useMediaQuery('(min-width: 640px)');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [login] = useLoginMutation();
 
@@ -32,8 +34,6 @@ export default function Login() {
     values: inputValues,
     { setErrors }: FormikHelpers<inputValues>
   ) => {
-    console.log(values);
-
     const res = await login({
       variables: values,
       update: (cache, { data }) => {
@@ -92,6 +92,7 @@ export default function Login() {
                       colorScheme="orange"
                       w="100%"
                       my={4}
+                      px={isLargerThan640 ? '20px' : '10px'}
                       isLoading={isSubmitting}
                       type="submit"
                       disabled={!dirty || !isValid}

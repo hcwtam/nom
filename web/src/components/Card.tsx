@@ -1,4 +1,4 @@
-import { Box, Text, Badge, Image, Spinner } from '@chakra-ui/react';
+import { Box, Text, Badge, Image, Spinner, Flex } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 
 interface CardProps {
@@ -19,7 +19,9 @@ export const Card = ({
 }: CardProps) => {
   const router = useRouter();
   return (
-    <Box
+    <Flex
+      flexDir="column"
+      alignItems="center"
       spacing="1.5rem"
       maxWidth="300px"
       p="2rem"
@@ -44,21 +46,34 @@ export const Card = ({
           fallback={<Spinner />}
         />
       ) : null}
-      <Text as="h3" fontSize="2xl" fontWeight="semibold" mb={5}>
+      <Text
+        as="h3"
+        fontSize="xl"
+        fontWeight="semibold"
+        w="200px"
+        h="60px"
+        mb={5}
+        noOfLines={2}
+        overflow="hidden"
+        textOverflow="ellipsis"
+        textAlign="center"
+      >
         {title}
       </Text>
-      <Badge bg="orange.100" color="gray.900" p={2} borderRadius="md" mr={2}>
-        <Text borderBottom="1px solid #dadada" fontWeight="normal">
-          Total time
-        </Text>
-        <Text>{prepTime} min</Text>
-      </Badge>
-      <Badge bg="orange.300" color="gray.900" p={2} borderRadius="md">
-        <Text borderBottom="1px solid #dadada" fontWeight="normal">
-          Cook time
-        </Text>
-        <Text>{activeTime} min</Text>
-      </Badge>
-    </Box>
+      <Box>
+        <Badge bg="orange.100" color="gray.900" p={2} borderRadius="md" mr={2}>
+          <Text borderBottom="1px solid #dadada" fontWeight="normal">
+            Total time
+          </Text>
+          <Text>{prepTime} min</Text>
+        </Badge>
+        <Badge bg="orange.300" color="gray.900" p={2} borderRadius="md">
+          <Text borderBottom="1px solid #dadada" fontWeight="normal">
+            Cook time
+          </Text>
+          <Text>{activeTime} min</Text>
+        </Badge>
+      </Box>
+    </Flex>
   );
 };

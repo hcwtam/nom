@@ -7,6 +7,7 @@ import { Container } from '../components/Container';
 import { Main } from '../components/Main';
 import Navbar from '../components/Navbar';
 import { useEventsQuery, Event } from '../generated/graphql';
+import { useNotAuth } from '../hooks/useNotAuth';
 import { EventType } from '../types';
 import { transformToCalendarEvent } from '../utils/utils';
 
@@ -22,6 +23,8 @@ const Schedule = () => {
     onOpen: onGenModalOpen,
     onClose: onGenModalClose
   } = useDisclosure();
+
+  useNotAuth(error);
 
   const loadingScreen = (
     <Container>

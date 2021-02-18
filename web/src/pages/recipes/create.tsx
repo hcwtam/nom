@@ -10,6 +10,7 @@ import { useCreateRecipeMutation } from '../../generated/graphql';
 import React from 'react';
 import { ImageUpload } from '../../components/form/ImageUpload';
 import { useRouter } from 'next/router';
+import { useNotAuth } from '../../hooks/useNotAuth';
 
 // formik objects
 const initialValues = {
@@ -63,6 +64,7 @@ const validationSchema = Yup.object({
 
 // component
 const CreateRecipe = () => {
+  useNotAuth();
   const router = useRouter();
   const [createRecipe] = useCreateRecipeMutation();
 
@@ -94,7 +96,7 @@ const CreateRecipe = () => {
   return (
     <Container minHeight="100vh">
       <Navbar />
-      <Main>
+      <Main mb="100px">
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -213,6 +215,7 @@ const CreateRecipe = () => {
                             </Flex>
                             {index === values.ingredients.length - 1 ? (
                               <Button
+                                mb="50px"
                                 onClick={() =>
                                   arrayHelpers.push({
                                     quantity: undefined,

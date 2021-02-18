@@ -396,7 +396,9 @@ export type RecipeQuery = (
   ) }
 );
 
-export type RecipesQueryVariables = Exact<{ [key: string]: never; }>;
+export type RecipesQueryVariables = Exact<{
+  cursor: Scalars['String'];
+}>;
 
 
 export type RecipesQuery = (
@@ -406,7 +408,7 @@ export type RecipesQuery = (
     & Pick<PagninatedRecipes, 'hasMore'>
     & { recipes: Array<(
       { __typename?: 'Recipe' }
-      & Pick<Recipe, 'id' | 'title' | 'description' | 'prepTime' | 'activeTime' | 'imageUrl'>
+      & Pick<Recipe, 'id' | 'title' | 'description' | 'prepTime' | 'activeTime' | 'imageUrl' | 'createdAt'>
     )> }
   ) }
 );
@@ -834,8 +836,8 @@ export type RecipeQueryHookResult = ReturnType<typeof useRecipeQuery>;
 export type RecipeLazyQueryHookResult = ReturnType<typeof useRecipeLazyQuery>;
 export type RecipeQueryResult = Apollo.QueryResult<RecipeQuery, RecipeQueryVariables>;
 export const RecipesDocument = gql`
-    query Recipes {
-  recipes(limit: 10) {
+    query Recipes($cursor: String!) {
+  recipes(limit: 12, cursor: $cursor) {
     recipes {
       id
       title
@@ -843,6 +845,7 @@ export const RecipesDocument = gql`
       prepTime
       activeTime
       imageUrl
+      createdAt
     }
     hasMore
   }
@@ -861,10 +864,11 @@ export const RecipesDocument = gql`
  * @example
  * const { data, loading, error } = useRecipesQuery({
  *   variables: {
+ *      cursor: // value for 'cursor'
  *   },
  * });
  */
-export function useRecipesQuery(baseOptions?: Apollo.QueryHookOptions<RecipesQuery, RecipesQueryVariables>) {
+export function useRecipesQuery(baseOptions: Apollo.QueryHookOptions<RecipesQuery, RecipesQueryVariables>) {
         return Apollo.useQuery<RecipesQuery, RecipesQueryVariables>(RecipesDocument, baseOptions);
       }
 export function useRecipesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RecipesQuery, RecipesQueryVariables>) {

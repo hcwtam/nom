@@ -1,37 +1,7 @@
+import { Flex } from '@chakra-ui/react';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-
-const thumbsContainer = {
-  display: 'flex',
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  marginTop: 16
-} as const;
-
-const thumb = {
-  display: 'inline-flex',
-  borderRadius: 2,
-  border: '1px solid #eaeaea',
-  marginBottom: 8,
-  marginRight: 8,
-  width: 100,
-  height: 100,
-  padding: 4,
-  boxSizing: 'border-box'
-} as const;
-
-const thumbInner = {
-  display: 'flex',
-  minWidth: 0,
-  overflow: 'hidden'
-} as const;
-
-const img = {
-  display: 'block',
-  width: 'auto',
-  height: '100%'
-} as const;
 
 export const ImageUpload = ({
   setFieldValue
@@ -79,14 +49,6 @@ export const ImageUpload = ({
     });
   };
 
-  const thumbs = files.map((file: any) => (
-    <div style={thumb} key={file.name}>
-      <div style={thumbInner}>
-        <img src={file.preview} style={img} />
-      </div>
-    </div>
-  ));
-
   useEffect(
     () => () => {
       // Make sure to revoke the data uris to avoid memory leaks
@@ -99,9 +61,25 @@ export const ImageUpload = ({
     <section className="container">
       <div {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
-        <p>Drag 'n' drop some files here, or click to select files</p>
+        <Flex
+          cursor="pointer"
+          w="100%"
+          h={files[0]?.preview ? '400px' : '200px'}
+          mb="30px"
+          borderRadius="5px"
+          border="2px dashed #808080"
+          justify="center"
+          align="center"
+          fontWeight="600"
+          backgroundImage={
+            files[0]?.preview ? `url(${files[0].preview as string})` : ''
+          }
+          backgroundPosition="center"
+          backgroundRepeat="no-repeat"
+        >
+          Add photo
+        </Flex>
       </div>
-      <aside style={thumbsContainer}>{thumbs}</aside>
     </section>
   );
 };
