@@ -54,7 +54,7 @@ export default function Register() {
 
   return (
     <>
-      <Button ml={4} onClick={onOpen}>
+      <Button ml={4} onClick={onOpen} colorScheme="orange">
         Register
       </Button>
 

@@ -52,7 +52,7 @@ export default function Login() {
 
   return (
     <>
-      <Button ml={4} onClick={onOpen}>
+      <Button ml={4} onClick={onOpen} colorScheme="orange">
         Login
       </Button>
 

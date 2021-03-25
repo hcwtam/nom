@@ -63,6 +63,7 @@ export default function Navbar(): ReactElement {
               mr={isLargerThan640 ? 4 : 2}
               px={isLargerThan640 ? '20px' : '10px'}
               onClick={() => router.push('/schedule')}
+              colorScheme="orange"
             >
               Schedule
             </Button>
@@ -70,6 +71,7 @@ export default function Navbar(): ReactElement {
               mr={isLargerThan640 ? 4 : 2}
               px={isLargerThan640 ? '20px' : '10px'}
               onClick={() => router.push('/recipes/create')}
+              colorScheme="orange"
             >
               Create
             </Button>
