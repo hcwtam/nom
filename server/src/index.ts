@@ -63,7 +63,8 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
         secure: __prod__, // cookies only work in https
-        sameSite: 'lax'
+        sameSite: 'none',
+        domain: __prod__ ? '.wesleytam.xyz' : undefined
       }
     })
   );

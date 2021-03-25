@@ -55,7 +55,8 @@ const main = async () => {
             maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
             httpOnly: true,
             secure: constants_1.__prod__,
-            sameSite: 'lax'
+            sameSite: 'none',
+            domain: constants_1.__prod__ ? '.wesleytam.xyz' : undefined
         }
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
