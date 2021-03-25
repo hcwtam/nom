@@ -32,7 +32,7 @@ const Recipe = () => {
     typeof router.query.id === 'string' ? parseInt(router.query.id) : -1;
   const { data, loading } = useRecipeQuery({ variables: { id: intId } });
 
-  if (loading)
+  if (loading || router.isFallback)
     return (
       <Container minH="100vh">
         <Spinner />
@@ -131,7 +131,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     paths: res.data.paths.map(({ id }) => ({
       params: { id: id.toString() }
     })),
-    fallback: false
+    fallback: true
   };
 };
 
